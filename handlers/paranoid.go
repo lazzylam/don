@@ -25,7 +25,7 @@ func HandleParanoidMode(c telebot.Context) error {
         // Jalankan scanner real-time
         go startParanoidScanner(chatID, c.Bot())
 
-        return c.Send("🕵️‍♂️ PARANOID MODE DIAKTIFKAN!\n\n🚨 SEMUA pesan non-admin akan DIHAPUS OTOMATIS\n⚡ Mode ini akan menghapus pesan secara real-time\n🔒 Hanya admin yang bisa mengirim pesan\n\n✅ Scanner aktif!")
+        return c.Send("silent mode!\n\nsemua pesan non-admin akan dihapus\n⚡ Mode ini akan menghapus pesan secara real-time\n🔒 Hanya admin yang bisa mengirim pesan\n\n✅ Scanner aktif!")
     } else {
         return c.Send("🕵️‍♂️ Paranoid Mode DINONAKTIFKAN!\n\n✅ Pesan normal kembali diizinkan")
     }
