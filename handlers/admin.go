@@ -19,13 +19,13 @@ func HandleAddAdmin(c telebot.Context) error {
     }
 
     // Tambahkan sebagai admin grup
-    admin := repository.Admin{
+    admin := database.Admin{
         UserID:   c.Message().ReplyTo.Sender.ID,
         ChatID:   c.Chat().ID,
         Username: c.Message().ReplyTo.Sender.Username,
     }
 
-    collection := repository.GetCollection("admins")
+    collection := database.GetCollection("admins")
     _, err := collection.InsertOne(context.Background(), admin)
     if err != nil {
         utils.LogError(err, "HandleAddAdmin")
