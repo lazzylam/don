@@ -2,9 +2,13 @@ package main
 
 import (
     "anti-gcast-bot/config"
-    "anti-gcast-bot/database"
     "anti-gcast-bot/handlers"
+    "anti-gcast-bot/repository"
+    "anti-gcast-bot/utils"
     "log"
+    "os"
+    "os/signal"
+    "syscall"
     "time"
 
     "gopkg.in/telebot.v3"
@@ -15,7 +19,8 @@ func main() {
     cfg := config.LoadConfig()
 
     // Initialize database
-    database.InitDB()
+    repository.InitDB(cfg)
+    defer repository.CloseDB()
 
     // Create bot
     bot, err := telebot.NewBot(telebot.Settings{
@@ -38,6 +43,16 @@ func main() {
     bot.Handle(telebot.OnPhoto, handlers.HandleMessage)
     bot.Handle(telebot.OnVideo, handlers.HandleMessage)
     bot.Handle(telebot.OnDocument, handlers.HandleMessage)
+
+    // Graceful shutdown
+    sigChan := make(chan os.Signal, 1)
+    signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+    
+    go func() {
+        <-sigChan
+        utils.LogInfo("Shutting down bot...")
+        bot.Stop()
+    }()
 
     log.Println("Bot is running...")
     bot.Start()
