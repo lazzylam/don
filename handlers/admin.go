@@ -1,14 +1,16 @@
 package handlers
 
 import (
-    "don/database"
-    "don/utils"
     "context"
 
-    "gopkg.in/telebot.v3"
+    "don/database"
+    "don/utils"
+
     "go.mongodb.org/mongo-driver/bson"
+    "gopkg.in/telebot.v3"
 )
 
+// Tambahkan fungsi-fungsi admin di sini jika diperlukan
 func HandleAddAdmin(c telebot.Context) error {
     if !utils.IsAdmin(c) {
         return c.Send("Hanya admin yang bisa menggunakan command ini!")
