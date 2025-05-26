@@ -21,8 +21,8 @@ func HandleMessage(c telebot.Context) error {
         return nil
     }
 
-    collection := repository.GetCollection("group_settings")
-    var settings repository.GroupSettings
+    collection := database.GetCollection("group_settings")
+    var settings database.GroupSettings
     
     filter := bson.M{"chat_id": c.Chat().ID}
     err := collection.FindOne(context.Background(), filter).Decode(&settings)
