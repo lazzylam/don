@@ -1,10 +1,10 @@
 package main
 
 import (
-    "anti-gcast-bot/config"
-    "anti-gcast-bot/handlers"
-    "anti-gcast-bot/repository"
-    "anti-gcast-bot/utils"
+    "don/config"
+    "don/handlers"
+    "don/database"
+    "don/utils"
     "log"
     "os"
     "os/signal"
