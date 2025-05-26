@@ -1,7 +1,7 @@
 package handlers
 
 import (
-    "anti-gcast-bot/repository"
+    "anti-gcast-bot/database"
     "anti-gcast-bot/utils"
     "context"
     "strings"
