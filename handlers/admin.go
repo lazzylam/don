@@ -1,8 +1,8 @@
 package handlers
 
 import (
-    "anti-gcast-bot/repository"
-    "anti-gcast-bot/utils"
+    "don/database"
+    "don/utils"
     "context"
 
     "gopkg.in/telebot.v3"
