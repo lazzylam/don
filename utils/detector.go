@@ -41,8 +41,8 @@ var (
     TMORegEx     = regexp.MustCompile(`(?i)\b(tmo|telegram\s+messenger\s+offline)\b`)
     JoinRegex    = regexp.MustCompile(`(?i)\b(join|gabung|daftar|add|masuk|tmo|vcs|sange|anjing)\b`)
     
-    // Regex untuk deteksi evasion
-    InvisibleCharsRegex = regexp.MustCompile(`[\u200B-\u200D\uFEFF]`)
+    // Regex untuk deteksi evasion  
+    InvisibleCharsRegex = regexp.MustCompile("[\u200B\u200C\u200D\uFEFF]")
     SpacedWordsRegex    = regexp.MustCompile(`(\b\w\s?){3,}\b`)
     SuspiciousPatterns  = []*regexp.Regexp{
         regexp.MustCompile(`(\w)\1{3,}`),       // Karakter berulang (joiiiiin)
