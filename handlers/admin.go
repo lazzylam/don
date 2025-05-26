@@ -1,13 +1,16 @@
 package handlers
 
 import (
-    "anti-gcast-bot/database"
+    "anti-gcast-bot/repository"
     "anti-gcast-bot/utils"
+    "context"
+
     "gopkg.in/telebot.v3"
+    "go.mongodb.org/mongo-driver/bson"
 )
 
 func HandleAddAdmin(c telebot.Context) error {
-    if !utils.IsAdmin(c.Sender().ID) {
+    if !utils.IsAdmin(c) {
         return c.Send("Hanya admin yang bisa menggunakan command ini!")
     }
 
@@ -15,19 +18,19 @@ func HandleAddAdmin(c telebot.Context) error {
         return c.Send("Balas pesan user yang ingin dijadikan admin!")
     }
 
-    userID := c.Message().ReplyTo.Sender.ID
-    username := c.Message().ReplyTo.Sender.Username
-
-    user := database.User{
-        UserID:   userID,
-        IsAdmin:  true,
-        Username: username,
+    // Tambahkan sebagai admin grup
+    admin := repository.Admin{
+        UserID:   c.Message().ReplyTo.Sender.ID,
+        ChatID:   c.Chat().ID,
+        Username: c.Message().ReplyTo.Sender.Username,
     }
 
-    if err := database.DB.Save(&user).Error; err != nil {
+    collection := repository.GetCollection("admins")
+    _, err := collection.InsertOne(context.Background(), admin)
+    if err != nil {
         utils.LogError(err, "HandleAddAdmin")
         return c.Send("Gagal menambahkan admin!")
     }
 
-    return c.Send("Admin berhasil ditambahkan!")
+    return c.Send("Admin grup berhasil ditambahkan!")
 }
