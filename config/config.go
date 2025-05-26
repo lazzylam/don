@@ -12,7 +12,7 @@ func LoadConfig() *Config {
     return &Config{
         BotToken:      os.Getenv("BOT_TOKEN"),
         MongoDBURI:    os.Getenv("MONGODB_URI"),
-        DBName:        "anti_gcast_bot",
+        DBName:        "don",
         MaxGoroutines: 100,
     }
 }
