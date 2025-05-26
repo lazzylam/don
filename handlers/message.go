@@ -1,45 +1,47 @@
 package handlers
 
 import (
-    "anti-gcast-bot/database"
+    "anti-gcast-bot/repository"
     "anti-gcast-bot/utils"
-    "gopkg.in/telebot.v3"
+    "context"
     "strings"
+
+    "gopkg.in/telebot.v3"
+    "go.mongodb.org/mongo-driver/bson"
 )
 
 func HandleMessage(c telebot.Context) error {
-    // Skip if message is from admin
-    if utils.IsAdmin(c.Sender().ID) {
+    // Skip jika pesan dari admin
+    if utils.IsAdmin(c) {
         return nil
     }
 
-    // Skip if message is empty or from private chat
+    // Skip jika pesan kosong atau dari private chat
     if c.Message().Text == "" || c.Chat().Type == telebot.ChatPrivate {
         return nil
     }
 
-    chatID := c.Chat().ID
-    var settings database.GroupSettings
-    if err := database.DB.First(&settings, "chat_id = ?", chatID).Error; err != nil {
-        // If no settings found, assume anti-gcast is off
-        return nil
-    }
-
-    // Check if anti-gcast is enabled
-    if !settings.AntiGCAST {
+    collection := repository.GetCollection("group_settings")
+    var settings repository.GroupSettings
+    
+    filter := bson.M{"chat_id": c.Chat().ID}
+    err := collection.FindOne(context.Background(), filter).Decode(&settings)
+    
+    // Jika tidak ada settings, anggap anti-gcast mati
+    if err != nil || !settings.AntiGCAST {
         return nil
     }
 
     text := strings.ToLower(c.Message().Text)
 
-    // Check whitelist
+    // Cek whitelist
     for _, w := range settings.Whitelist {
         if strings.Contains(text, strings.ToLower(w)) {
             return nil
         }
     }
 
-    // Check blacklist
+    // Cek blacklist
     for _, b := range settings.Blacklist {
         if strings.Contains(text, strings.ToLower(b)) {
             _ = c.Delete()
@@ -47,7 +49,7 @@ func HandleMessage(c telebot.Context) error {
         }
     }
 
-    // Check for GCAST patterns
+    // Cek pola GCAST
     if utils.IsGCASTMessage(text) {
         _ = c.Delete()
         return nil
