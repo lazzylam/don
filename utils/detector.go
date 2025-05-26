@@ -17,7 +17,7 @@ var (
 // Deteksi utama yang mengkombinasikan semua pola
 func IsGCASTMessage(text string) bool {
     text = strings.ToLower(text)
-    
+
     // Deteksi dasar menggunakan regex global
     if LinkRegex.MatchString(text) || 
        MentionRegex.MatchString(text) || 
@@ -25,7 +25,7 @@ func IsGCASTMessage(text string) bool {
        JoinRegex.MatchString(text) {
         return true
     }
-    
+
     // Deteksi lanjutan
     return detectSuspiciousPattern(text) ||
            detectHiddenUnicode(text) ||
@@ -61,10 +61,13 @@ func detectHiddenUnicode(text string) bool {
 
 // Deteksi manipulasi font
 func detectFontManipulation(text string) bool {
+    // Menggunakan Range32 karena nilai 0x1D400 dan 0x1D7FF terlalu besar untuk uint16
     suspiciousRanges := []*unicode.RangeTable{
-        {R16: []unicode.Range16{{0x1D400, 0x1D7FF, 1}}}, // Mathematical Alphanumeric
+        {
+            R32: []unicode.Range32{{0x1D400, 0x1D7FF, 1}}, // Mathematical Alphanumeric
+        },
     }
-    
+
     for _, r := range text {
         if unicode.IsOneOf(suspiciousRanges, r) {
             return true
