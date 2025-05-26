@@ -1,13 +1,14 @@
 package handlers
 
 import (
-    "don/database"
-    "don/utils"
     "context"
 
-    "gopkg.in/telebot.v3"
+    "don/database"
+    "don/utils"
+
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/mongo/options"
+    "gopkg.in/telebot.v3"
 )
 
 func HandleOn(c telebot.Context) error {
@@ -62,7 +63,7 @@ func HandleAddWhite(c telebot.Context) error {
     update := bson.M{"$addToSet": bson.M{"whitelist": text}}
     opts := options.Update().SetUpsert(true)
 
-    _, err := database.UpdateOne(context.Background(), filter, update, opts)
+    _, err := collection.UpdateOne(context.Background(), filter, update, opts)
     if err != nil {
         utils.LogError(err, "HandleAddWhite")
         return c.Send("Gagal menambahkan ke whitelist!")
