@@ -34,7 +34,7 @@ func HandleOff(c telebot.Context) error {
         return nil
     }
 
-    collection := repository.GetCollection("group_settings")
+    collection := database.GetCollection("group_settings")
     filter := bson.M{"chat_id": c.Chat().ID}
     update := bson.M{"$set": bson.M{"anti_gcast": false}}
 
@@ -57,12 +57,12 @@ func HandleAddWhite(c telebot.Context) error {
         return c.Send("Masukkan kata kunci yang ingin di-whitelist!")
     }
 
-    collection := repository.GetCollection("group_settings")
+    collection := database.GetCollection("group_settings")
     filter := bson.M{"chat_id": c.Chat().ID}
     update := bson.M{"$addToSet": bson.M{"whitelist": text}}
     opts := options.Update().SetUpsert(true)
 
-    _, err := collection.UpdateOne(context.Background(), filter, update, opts)
+    _, err := database.UpdateOne(context.Background(), filter, update, opts)
     if err != nil {
         utils.LogError(err, "HandleAddWhite")
         return c.Send("Gagal menambahkan ke whitelist!")
@@ -81,7 +81,7 @@ func HandleAddBL(c telebot.Context) error {
         return c.Send("Masukkan kata kunci yang ingin di-blacklist!")
     }
 
-    collection := repository.GetCollection("group_settings")
+    collection := database.GetCollection("group_settings")
     filter := bson.M{"chat_id": c.Chat().ID}
     update := bson.M{"$addToSet": bson.M{"blacklist": text}}
     opts := options.Update().SetUpsert(true)
