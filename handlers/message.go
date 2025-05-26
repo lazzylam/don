@@ -1,8 +1,8 @@
 package handlers
 
 import (
-    "anti-gcast-bot/database"
-    "anti-gcast-bot/utils"
+    "don/database"
+    "don/utils"
     "context"
     "strings"
 
