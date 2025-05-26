@@ -1,5 +1,4 @@
 package config
-import "os"
 
 type Config struct {
     BotToken       string
