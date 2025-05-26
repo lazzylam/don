@@ -10,7 +10,7 @@ import (
 func DetectEvasion(text string) bool {
     // Normalisasi teks (hapus spasi berlebihan, ubah ke lowercase)
     normalized := strings.ToLower(strings.Join(strings.Fields(text), ""))
-    
+
     // Cek manipulasi
     return containsInvisibleChars(text) ||
            usesHomoglyphs(normalized) ||
@@ -31,9 +31,9 @@ func usesHomoglyphs(text string) bool {
         'а': 'a', // Cyrillic 'а'
         'о': 'o', // Cyrillic 'о'
     }
-    
+
     for _, r := range text {
-        if replacement, ok := homoglyphs[r]; ok {
+        if _, ok := homoglyphs[r]; ok {
             if unicode.Is(unicode.Cyrillic, r) {
                 return true
             }
@@ -53,10 +53,14 @@ func hasSuspiciousSpacing(text string) bool {
 func usesFontManipulation(text string) bool {
     // Range Unicode untuk font styling
     styledRanges := []*unicode.RangeTable{
-        unicode.RangeTable{R16: []unicode.Range16{{0x1D400, 0x1D7FF, 1}}}, // Mathematical Alphanumeric
-        unicode.RangeTable{R16: []unicode.Range16{{0xFE70, 0xFEFF, 1}}},   // Arabic Presentation Forms
+        {
+            R32: []unicode.Range32{{0x1D400, 0x1D7FF, 1}}, // Mathematical Alphanumeric
+        },
+        {
+            R16: []unicode.Range16{{0xFE70, 0xFEFF, 1}}, // Arabic Presentation Forms
+        },
     }
-    
+
     for _, r := range text {
         if unicode.IsOneOf(styledRanges, r) {
             return true
