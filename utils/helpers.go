@@ -1,16 +1,35 @@
 package utils
 
 import (
-    "anti-gcast-bot/database"
+    "anti-gcast-bot/repository"
+    "context"
     "strconv"
+
+    "gopkg.in/telebot.v3"
+    "go.mongodb.org/mongo-driver/bson"
 )
 
-func IsAdmin(userID int64) bool {
-    var user database.User
-    if err := database.DB.Where("user_id = ?", userID).First(&user).Error; err != nil {
+func IsAdmin(c telebot.Context) bool {
+    // Periksa apakah pengguna adalah admin grup
+    member, err := c.Bot().ChatMemberOf(c.Chat(), c.Sender())
+    if err == nil && (member.Role == telebot.Administrator || member.Role == telebot.Creator) {
+        return true
+    }
+
+    // Periksa database untuk admin global
+    collection := repository.GetCollection("admins")
+    filter := bson.M{"user_id": c.Sender().ID, "$or": []bson.M{
+        {"chat_id": 0},
+        {"chat_id": c.Chat().ID},
+    }}
+    
+    count, err := collection.CountDocuments(context.Background(), filter)
+    if err != nil {
+        LogError(err, "IsAdmin")
         return false
     }
-    return user.IsAdmin
+
+    return count > 0
 }
 
 func Int64ToString(i int64) string {
