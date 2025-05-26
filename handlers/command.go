@@ -1,23 +1,27 @@
 package handlers
 
 import (
-    "anti-gcast-bot/database"
+    "anti-gcast-bot/repository"
     "anti-gcast-bot/utils"
+    "context"
+
     "gopkg.in/telebot.v3"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func HandleOn(c telebot.Context) error {
-    if !utils.IsAdmin(c.Sender().ID) && c.Chat().Type != telebot.ChatPrivate {
+    if !utils.IsAdmin(c) && c.Chat().Type != telebot.ChatPrivate {
         return nil
     }
 
-    chatID := c.Chat().ID
-    settings := database.GroupSettings{
-        ChatID:    chatID,
-        AntiGCAST: true,
-    }
+    collection := repository.GetCollection("group_settings")
+    filter := bson.M{"chat_id": c.Chat().ID}
+    update := bson.M{"$set": bson.M{"anti_gcast": true}}
+    opts := options.Update().SetUpsert(true)
 
-    if err := database.DB.Save(&settings).Error; err != nil {
+    _, err := collection.UpdateOne(context.Background(), filter, update, opts)
+    if err != nil {
         utils.LogError(err, "HandleOn")
         return c.Send("Gagal mengaktifkan Anti-GCAST!")
     }
@@ -26,14 +30,16 @@ func HandleOn(c telebot.Context) error {
 }
 
 func HandleOff(c telebot.Context) error {
-    if !utils.IsAdmin(c.Sender().ID) && c.Chat().Type != telebot.ChatPrivate {
+    if !utils.IsAdmin(c) && c.Chat().Type != telebot.ChatPrivate {
         return nil
     }
 
-    chatID := c.Chat().ID
-    if err := database.DB.Model(&database.GroupSettings{}).
-        Where("chat_id = ?", chatID).
-        Update("anti_gcast", false).Error; err != nil {
+    collection := repository.GetCollection("group_settings")
+    filter := bson.M{"chat_id": c.Chat().ID}
+    update := bson.M{"$set": bson.M{"anti_gcast": false}}
+
+    _, err := collection.UpdateOne(context.Background(), filter, update)
+    if err != nil {
         utils.LogError(err, "HandleOff")
         return c.Send("Gagal menonaktifkan Anti-GCAST!")
     }
@@ -42,7 +48,7 @@ func HandleOff(c telebot.Context) error {
 }
 
 func HandleAddWhite(c telebot.Context) error {
-    if !utils.IsAdmin(c.Sender().ID) {
+    if !utils.IsAdmin(c) {
         return c.Send("Hanya admin yang bisa menggunakan command ini!")
     }
 
@@ -51,15 +57,13 @@ func HandleAddWhite(c telebot.Context) error {
         return c.Send("Masukkan kata kunci yang ingin di-whitelist!")
     }
 
-    chatID := c.Chat().ID
-    var settings database.GroupSettings
-    if err := database.DB.FirstOrCreate(&settings, database.GroupSettings{ChatID: chatID}).Error; err != nil {
-        utils.LogError(err, "HandleAddWhite")
-        return c.Send("Gagal menambahkan ke whitelist!")
-    }
+    collection := repository.GetCollection("group_settings")
+    filter := bson.M{"chat_id": c.Chat().ID}
+    update := bson.M{"$addToSet": bson.M{"whitelist": text}}
+    opts := options.Update().SetUpsert(true)
 
-    settings.Whitelist = append(settings.Whitelist, text)
-    if err := database.DB.Save(&settings).Error; err != nil {
+    _, err := collection.UpdateOne(context.Background(), filter, update, opts)
+    if err != nil {
         utils.LogError(err, "HandleAddWhite")
         return c.Send("Gagal menambahkan ke whitelist!")
     }
@@ -68,7 +72,7 @@ func HandleAddWhite(c telebot.Context) error {
 }
 
 func HandleAddBL(c telebot.Context) error {
-    if !utils.IsAdmin(c.Sender().ID) {
+    if !utils.IsAdmin(c) {
         return c.Send("Hanya admin yang bisa menggunakan command ini!")
     }
 
@@ -77,15 +81,13 @@ func HandleAddBL(c telebot.Context) error {
         return c.Send("Masukkan kata kunci yang ingin di-blacklist!")
     }
 
-    chatID := c.Chat().ID
-    var settings database.GroupSettings
-    if err := database.DB.FirstOrCreate(&settings, database.GroupSettings{ChatID: chatID}).Error; err != nil {
-        utils.LogError(err, "HandleAddBL")
-        return c.Send("Gagal menambahkan ke blacklist!")
-    }
+    collection := repository.GetCollection("group_settings")
+    filter := bson.M{"chat_id": c.Chat().ID}
+    update := bson.M{"$addToSet": bson.M{"blacklist": text}}
+    opts := options.Update().SetUpsert(true)
 
-    settings.Blacklist = append(settings.Blacklist, text)
-    if err := database.DB.Save(&settings).Error; err != nil {
+    _, err := collection.UpdateOne(context.Background(), filter, update, opts)
+    if err != nil {
         utils.LogError(err, "HandleAddBL")
         return c.Send("Gagal menambahkan ke blacklist!")
     }
