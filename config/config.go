@@ -1,4 +1,5 @@
 package config
+import "os"
 
 type Config struct {
     BotToken       string
@@ -9,8 +10,8 @@ type Config struct {
 
 func LoadConfig() *Config {
     return &Config{
-        BotToken:      "YOUR_BOT_TOKEN",
-        MongoDBURI:    "mongodb://localhost:27017",
+        BotToken:      os.Getenv("BOT_TOKEN"),
+        MongoDBURI:    os.Getenv("MONGODB_URI"),
         DBName:        "anti_gcast_bot",
         MaxGoroutines: 100,
     }
