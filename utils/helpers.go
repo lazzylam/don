@@ -17,7 +17,7 @@ func IsAdmin(c telebot.Context) bool {
     }
 
     // Periksa database untuk admin global
-    collection := repository.GetCollection("admins")
+    collection := database.GetCollection("admins")
     filter := bson.M{"user_id": c.Sender().ID, "$or": []bson.M{
         {"chat_id": 0},
         {"chat_id": c.Chat().ID},
