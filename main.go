@@ -19,8 +19,8 @@ func main() {
     cfg := config.LoadConfig()
 
     // Initialize database
-    repository.InitDB(cfg)
-    defer repository.CloseDB()
+    database.InitDB(cfg)
+    defer database.CloseDB()
 
     // Create bot
     bot, err := telebot.NewBot(telebot.Settings{
