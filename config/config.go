@@ -1,15 +1,17 @@
 package config
 
 type Config struct {
-    BotToken      string
-    AdminIDs      []int64
-    MaxGoroutines int
+    BotToken       string
+    MongoDBURI     string
+    DBName         string
+    MaxGoroutines  int
 }
 
 func LoadConfig() *Config {
     return &Config{
         BotToken:      "YOUR_BOT_TOKEN",
-        AdminIDs:      []int64{123456789}, // Ganti dengan ID admin Anda
+        MongoDBURI:    "mongodb://localhost:27017",
+        DBName:        "anti_gcast_bot",
         MaxGoroutines: 100,
     }
 }
