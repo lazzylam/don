@@ -1,14 +1,18 @@
 package database
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type GroupSettings struct {
-    ChatID       int64 `gorm:"primaryKey"`
-    AntiGCAST    bool
-    Whitelist    []string `gorm:"serializer:json"`
-    Blacklist    []string `gorm:"serializer:json"`
+    ID         primitive.ObjectID `bson:"_id,omitempty"`
+    ChatID     int64             `bson:"chat_id"`
+    AntiGCAST  bool              `bson:"anti_gcast"`
+    Whitelist  []string          `bson:"whitelist"`
+    Blacklist  []string          `bson:"blacklist"`
 }
 
-type User struct {
-    UserID    int64 `gorm:"primaryKey"`
-    IsAdmin   bool
-    Username  string
+type Admin struct {
+    ID       primitive.ObjectID `bson:"_id,omitempty"`
+    UserID   int64             `bson:"user_id"`
+    ChatID   int64             `bson:"chat_id"` // 0 untuk admin global
+    Username string            `bson:"username"`
 }
