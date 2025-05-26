@@ -37,12 +37,15 @@ func main() {
     bot.Handle("/addwhite", handlers.HandleAddWhite)
     bot.Handle("/addbl", handlers.HandleAddBL)
     bot.Handle("/addadmin", handlers.HandleAddAdmin)
-    
+bot.Handle("/paranoid", handlers.HandleParanoidMode)
+
     // Handle all messages
     bot.Handle(telebot.OnText, handlers.HandleMessage)
     bot.Handle(telebot.OnPhoto, handlers.HandleMessage)
     bot.Handle(telebot.OnVideo, handlers.HandleMessage)
     bot.Handle(telebot.OnDocument, handlers.HandleMessage)
+bot.Handle(telebot.OnText, handlers.HandleParanoidMessage)
+    
 
     // Graceful shutdown
     sigChan := make(chan os.Signal, 1)
