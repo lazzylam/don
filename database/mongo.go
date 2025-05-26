@@ -1,7 +1,7 @@
 package database
 
 import (
-    "anti-gcast-bot/config"
+    "don/config"
     "context"
     "log"
     "time"
