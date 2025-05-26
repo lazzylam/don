@@ -1,7 +1,7 @@
 package utils
 
 import (
-    "anti-gcast-bot/repository"
+    "don/database"
     "context"
     "strconv"
 
