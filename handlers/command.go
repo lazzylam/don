@@ -15,7 +15,7 @@ func HandleOn(c telebot.Context) error {
         return nil
     }
 
-    collection := repository.GetCollection("group_settings")
+    collection := database.GetCollection("group_settings")
     filter := bson.M{"chat_id": c.Chat().ID}
     update := bson.M{"$set": bson.M{"anti_gcast": true}}
     opts := options.Update().SetUpsert(true)
