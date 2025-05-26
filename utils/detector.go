@@ -45,8 +45,7 @@ var (
     InvisibleCharsRegex = regexp.MustCompile("[\u200B\u200C\u200D\uFEFF]")
     SpacedWordsRegex    = regexp.MustCompile(`(\b\w\s?){3,}\b`)
     SuspiciousPatterns  = []*regexp.Regexp{
-        regexp.MustCompile(`(\w)\1{3,}`),       // Karakter berulang (joiiiiin)
-        regexp.MustCompile(`[a-z]+\d+[a-z]+`),  // Kata dengan angka (j0in)
+        regexp.MustCompile(`[a-z]+[0-9]+[a-z]+`), // Kata dengan angka (j0in)
         regexp.MustCompile(`\b\w{15,}\b`),      // Kata sangat panjang
         regexp.MustCompile(`\S\s\S\s\S\s\S`),   // Spasi tidak wajar
     }
@@ -238,9 +237,33 @@ func (mf *MessageFilter) logDetection(userID, text string, result *DetectionResu
 // detectSuspiciousPattern deteksi pola mencurigakan
 func (mf *MessageFilter) detectSuspiciousPattern(text string) bool {
     text = strings.ToLower(text)
+    
+    // Cek regex patterns
     for _, pattern := range SuspiciousPatterns {
         if pattern.MatchString(text) {
             return true
+        }
+    }
+    
+    // Manual check untuk karakter berulang (karena Go tidak support backreference)
+    return mf.hasRepeatedChars(text)
+}
+
+// hasRepeatedChars deteksi karakter berulang manual
+func (mf *MessageFilter) hasRepeatedChars(text string) bool {
+    if len(text) < 4 {
+        return false
+    }
+    
+    count := 1
+    for i := 1; i < len(text); i++ {
+        if text[i] == text[i-1] {
+            count++
+            if count >= 4 { // 4 atau lebih karakter sama berturut-turut
+                return true
+            }
+        } else {
+            count = 1
         }
     }
     return false
