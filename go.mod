@@ -1,4 +1,4 @@
-module anti-gcast-bot
+module don
 
 go 1.21
 
